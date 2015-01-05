@@ -46,7 +46,7 @@ namespace cpp{
 
 			size_t report_size = no_lines / 10;
 			size_t count = 0;
-			while (std::getline(_file, line) && count < no_lines) {
+			while (count < no_lines && std::getline(_file, line)) {
 
 				if (count % report_size == 0){
 
