@@ -30,6 +30,7 @@ namespace cpp{
 
 		double _logloss;
 		std::unordered_map<size_t, std::vector<double>> _wzn;
+		std::unordered_map<size_t, std::pair<size_t, size_t>> _id_imp_cl;
 
 		bool _check_wzn_exist(const size_t xi){
 
@@ -51,6 +52,20 @@ namespace cpp{
 
 			std::hash<string> hash_fn;
 
+			size_t id_hash = hash_fn(x_raw[0]);
+			std::unordered_map<size_t, std::pair<size_t, size_t>>::iterator it_id_imp_cl = _id_imp_cl.find(id_hash);
+			bool is_new = it_id_imp_cl == _id_imp_cl.end();
+			if (is_new){
+
+				x.push_back(std::make_pair(hash_fn("F_NEW"), 1));
+				_id_imp_cl.insert(std::make_pair(id_hash, std::make_pair(0, 0)));
+			}
+			else{
+
+				x.push_back(std::make_pair(hash_fn("F_NEW"), 0));
+			}
+
+
 			for (int i = 0; i < x_raw.size(); ++i){
 
 				if (i == 1 && is_train)
@@ -60,15 +75,30 @@ namespace cpp{
 				if (is_train && i > 1)
 					header_i = i - 1;
 				
-				string f = string(string("F") + fheaders[header_i] + "_" + x_raw[i]);
-				x.push_back(std::make_pair(hash_fn(f), 1));
+				if (header_i != 5 && header_i != 8 && x_raw[i] != "d41d8cd9"){
+
+					string f = string(string("F") + fheaders[header_i] + "_" + x_raw[i]);
+					x.push_back(std::make_pair(hash_fn(f), 1));
+					if (is_new && header_i > 0 && header_i < 15){
+
+						x.push_back(std::make_pair(hash_fn(f+"_F_NEW"), 1));
+					}
+					else{
+
+						x.push_back(std::make_pair(hash_fn(f + "_F_EXIST"), 1));
+					}
+				}
 			};
 
-			//std::unordered_map<string, std::vector<double>>::const_iterator it_wzn = _wzn.find(x[0]);
-			//if (it_wzn == _wzn.end()){
 
-			//	x.push_back("F_NEW");
-			//}
+			std::pair<size_t, size_t>* imp_cl = &_id_imp_cl[id_hash];
+
+			x.push_back(std::make_pair(hash_fn("F_IMP"), imp_cl->first/100000));
+			x.push_back(std::make_pair(hash_fn("F_CL"), imp_cl->second/1000));
+
+			imp_cl->first += 1;
+			if (is_train)
+				imp_cl->second += std::stod(x_raw[1]);
 		}
 
 		double _calc_logloss(const double p, const double y){
@@ -81,7 +111,7 @@ namespace cpp{
 
 			double y = std::stod(x_raw[1]);
 
-			std::vector<std::pair<size_t, size_t>> x(NO_FEATURE);
+			std::vector<std::pair<size_t, size_t>> x;
 			_gen_features(x_raw, x, true);
 
 			//predict
@@ -131,7 +161,7 @@ namespace cpp{
 
 		double predict(const std::vector<string>& x_raw, bool is_validate){
 
-			std::vector<std::pair<size_t, size_t>> x(NO_FEATURE);
+			std::vector<std::pair<size_t, size_t>> x;
 			_gen_features(x_raw, x, is_validate);
 
 			double wTx = 0;

@@ -19,8 +19,8 @@
 
 using std::string;
 
-#define PARALLEL_SIZE 3 //also defines how many learners. i.e. one learner per thread
-#define BLOCK_SIZE 1000000 //1m rows
+#define PARALLEL_SIZE 1 //also defines how many learners. i.e. one learner per thread
+#define BLOCK_SIZE 500000 //0.5m rows
 
 
 string _get_current_dt_str(){
@@ -48,7 +48,8 @@ double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 	std::future<void> fut_train;
 
 	int block_i = 0;
-	concurrency::combinable<double> logloss;
+	//concurrency::combinable<double> logloss;
+	double logloss = 0;
 	while (train_file.read_chunk(BLOCK_SIZE, block_vec, PARALLEL_SIZE)) {
 
 		std::cout << "read in block " << block_i << " @" << _get_current_dt_str() << std::endl;
@@ -69,11 +70,12 @@ double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 		std::cout << "start training block " << block_i++ << " @" << _get_current_dt_str() << std::endl;
 		fut_train = std::async([&]{
 
-			concurrency::parallel_for(size_t(0), size_t(PARALLEL_SIZE),
-				[&learner, &block_vec_copy, &logloss](int i){
+			//concurrency::parallel_for(size_t(0), size_t(PARALLEL_SIZE),
+			//	[&learner, &block_vec_copy, &logloss](int i){
 
-				logloss.local() += learner[i].train(block_vec_copy[i]);
-			});
+			//	logloss.local() += learner[i].train(block_vec_copy[i]);
+			//});
+			logloss += learner[0].train(block_vec_copy[0]);
 		});
 
 		for (int i = 0; i < PARALLEL_SIZE; i++){
@@ -89,7 +91,8 @@ double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 	}
 
 	train_file.close();
-	return logloss.combine(std::plus<double>()) / block_i;
+	//return logloss.combine(std::plus<double>()) / block_i;
+	return logloss / block_i;
 }
 
 void _test(cpp::ftrl (&learner)[PARALLEL_SIZE]){
