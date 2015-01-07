@@ -18,16 +18,10 @@ void cpp::ftrl::_gen_features(const std::vector<string>& x_raw, std::vector<std:
 	bool is_new = it_id_imp_cl == _id_imp_cl.end();
 	if (is_new){
 
-		//x.push_back(std::make_pair(hash_fn("F_NEW"), 1));
 		if (is_train){
 			_id_imp_cl.insert(std::make_pair(id_hash, std::make_pair(0, 0)));
 		}
 	}
-	//else{
-
-	//	x.push_back(std::make_pair(hash_fn("F_OLD"), 1));
-	//}
-
 
 	int header_i = 0;
 	for (int i = 0; i < x_raw.size(); ++i){
@@ -39,19 +33,6 @@ void cpp::ftrl::_gen_features(const std::vector<string>& x_raw, std::vector<std:
 				
 			string f = string("F") + fheaders[header_i] + "_" + x_raw[i];
 			x.push_back(std::make_pair(hash_fn(f), 1));
-
-			////interact NEW feature
-			//if (header_i > 0){
-
-			//	string new_f = is_new ? "_NEW" : "_OLD";
-			//	string f = string("F") + fheaders[header_i] + "_" + x_raw[i] + new_f;
-			//	x.push_back(std::make_pair(hash_fn(f), 1));
-			//}
-			//else{
-			//
-			//	string f = string("F") + fheaders[header_i] + "_" + x_raw[i];
-			//	x.push_back(std::make_pair(hash_fn(f), 1));
-			//}
 		}
 
 		header_i++;
