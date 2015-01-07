@@ -13,7 +13,7 @@
 using std::string;
 
 #define D pow(2, 29)
-#define NO_FEATURE 23
+#define NO_FEATURE 50
 #define HOLD_OUT 8
 
 namespace cpp{
@@ -48,58 +48,7 @@ namespace cpp{
 			}
 		}
 
-		void _gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, size_t>>& x, bool is_train){
-
-			std::hash<string> hash_fn;
-
-			size_t id_hash = hash_fn(x_raw[0]);
-			std::unordered_map<size_t, std::pair<size_t, size_t>>::iterator it_id_imp_cl = _id_imp_cl.find(id_hash);
-			bool is_new = it_id_imp_cl == _id_imp_cl.end();
-			if (is_new){
-
-				x.push_back(std::make_pair(hash_fn("F_NEW"), 1));
-				_id_imp_cl.insert(std::make_pair(id_hash, std::make_pair(0, 0)));
-			}
-			else{
-
-				x.push_back(std::make_pair(hash_fn("F_NEW"), 0));
-			}
-
-
-			for (int i = 0; i < x_raw.size(); ++i){
-
-				if (i == 1 && is_train)
-					continue;
-
-				int header_i = i;
-				if (is_train && i > 1)
-					header_i = i - 1;
-				
-				if (header_i != 5 && header_i != 8 && x_raw[i] != "d41d8cd9"){
-
-					string f = string(string("F") + fheaders[header_i] + "_" + x_raw[i]);
-					x.push_back(std::make_pair(hash_fn(f), 1));
-					if (is_new && header_i > 0 && header_i < 15){
-
-						x.push_back(std::make_pair(hash_fn(f+"_F_NEW"), 1));
-					}
-					else{
-
-						x.push_back(std::make_pair(hash_fn(f + "_F_EXIST"), 1));
-					}
-				}
-			};
-
-
-			std::pair<size_t, size_t>* imp_cl = &_id_imp_cl[id_hash];
-
-			x.push_back(std::make_pair(hash_fn("F_IMP"), imp_cl->first/100000));
-			x.push_back(std::make_pair(hash_fn("F_CL"), imp_cl->second/1000));
-
-			imp_cl->first += 1;
-			if (is_train)
-				imp_cl->second += std::stod(x_raw[1]);
-		}
+		void _gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, size_t>>& x, bool is_train);
 
 		double _calc_logloss(const double p, const double y){
 
@@ -183,15 +132,15 @@ namespace cpp{
 			for (std::vector<std::vector<string>>::const_iterator it = block_vec.begin();
 				it != block_vec.end(); ++it)	{
 
-				if (count % HOLD_OUT == 0 || count % HOLD_OUT == 1){
+				//if (count % HOLD_OUT == 0 || count % HOLD_OUT == 1){
 
-					double p = predict(*it, true);
-					_logloss += _calc_logloss(p, std::stod((*it)[1]));
-				}
-				else
-					_train(*it);
+				//	double p = predict(*it, true);
+				//	_logloss += _calc_logloss(p, std::stod((*it)[1]));
+				//	count++;
+				//}
+				//else
 
-				count++;
+				_train(*it);
 			}
 
 			return _logloss / (count - 2);
