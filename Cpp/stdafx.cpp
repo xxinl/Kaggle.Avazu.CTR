@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <iostream>
 #include <future>
-#include <ppl.h>
 
 
 #include <boost/tokenizer.hpp>

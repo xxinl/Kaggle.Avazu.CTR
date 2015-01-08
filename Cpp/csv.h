@@ -37,11 +37,8 @@ namespace cpp{
 				_file.close();
 		}
 		
-		bool read_chunk(size_t no_lines, std::vector<std::vector<string>>* block_vec, int parallel_size){
+		bool read_chunk(size_t no_lines, std::vector<std::vector<string>>& block_vec){	
 		
-			//for (int i = 0; i < parallel_size; ++i)
-			//	block_vec[i].reserve(no_lines);
-			
 			string line;
 
 			size_t report_size = no_lines / 10;
@@ -64,12 +61,12 @@ namespace cpp{
 					row_vec.push_back(*it);
 				}
 
-				block_vec[count % parallel_size].push_back(row_vec);
+				block_vec.push_back(row_vec);
 
 				count++;
 			}
 
-			return block_vec[0].size() > 0;
+			return block_vec.size() > 0;
 		}
 	};
 }

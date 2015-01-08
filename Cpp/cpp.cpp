@@ -9,7 +9,6 @@
 #include <sstream>
 #include <iostream>
 #include <future>
-#include <ppl.h>
 
 #include <boost/date_time.hpp>
 
@@ -19,7 +18,6 @@
 
 using std::string;
 
-#define PARALLEL_SIZE 1 //also defines how many learners. i.e. one learner per thread
 #define BLOCK_SIZE 500000 //0.5m rows
 
 
@@ -38,19 +36,18 @@ string _get_current_dt_str(){
 	return s.str();
 }
 
-double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
+double _train(cpp::ftrl& learner){
 
 	//train----------------------------
 	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train.csv");
 
-	std::vector<std::vector<string>> block_vec[PARALLEL_SIZE];
-	std::vector<std::vector<string>> block_vec_copy[PARALLEL_SIZE];
+	std::vector<std::vector<string>> block_vec;
+	std::vector<std::vector<string>> block_vec_copy;
 	std::future<void> fut_train;
 
 	int block_i = 0;
-	//concurrency::combinable<double> logloss;
 	double logloss = 0;
-	while (train_file.read_chunk(BLOCK_SIZE, block_vec, PARALLEL_SIZE)) {
+	while (train_file.read_chunk(BLOCK_SIZE, block_vec)) {
 
 		std::cout << "read in block " << block_i << " @" << _get_current_dt_str() << std::endl;
 
@@ -62,26 +59,15 @@ double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 		else
 			std::cout << std::endl;
 
-		for (int i = 0; i < PARALLEL_SIZE; i++){
-
-			block_vec_copy[i].swap(block_vec[i]);
-		}
+		block_vec_copy.swap(block_vec);
 
 		std::cout << "start training block " << block_i++ << " @" << _get_current_dt_str() << std::endl;
 		fut_train = std::async([&]{
 
-			//concurrency::parallel_for(size_t(0), size_t(PARALLEL_SIZE),
-			//	[&learner, &block_vec_copy, &logloss](int i){
-
-			//	logloss.local() += learner[i].train(block_vec_copy[i]);
-			//});
-			logloss += learner[0].train(block_vec_copy[0]);
+			logloss += learner.train(block_vec_copy);
 		});
 
-		for (int i = 0; i < PARALLEL_SIZE; i++){
-
-			block_vec[i].clear();
-		}
+		block_vec.clear();
 	}
 
 	if (fut_train.valid())
@@ -91,11 +77,10 @@ double _train(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 	}
 
 	train_file.close();
-	//return logloss.combine(std::plus<double>()) / block_i;
 	return logloss / block_i;
 }
 
-void _test(cpp::ftrl (&learner)[PARALLEL_SIZE]){
+void _test(cpp::ftrl& learner){
 
 	//predict------------------------
 	cpp::csv test_file("C:/Workspace/Kaggle/CRT/data/test.csv");
@@ -109,7 +94,7 @@ void _test(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 	std::future<void> fut_test;
 
 	int block_i = 0;
-	while (test_file.read_chunk(400000, &block_vec, 1)) {
+	while (test_file.read_chunk(400000, block_vec)) {
 
 		std::cout << "reading in block " << block_i << " @" << _get_current_dt_str() << std::endl;
 
@@ -130,11 +115,9 @@ void _test(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 				it != block_vec_copy.end(); ++it)	{
 
 				double p = 0;
-				for (int i = 0; i < PARALLEL_SIZE; i++){
+				p = learner.predict(*it, false);
 
-					p = learner[i].predict(*it, false);
-				}
-				submit_file << (*it)[0] << "," << p / PARALLEL_SIZE << std::endl;
+				submit_file << (*it)[0] << "," << p << std::endl;
 			}
 		});
 
@@ -155,7 +138,7 @@ void _test(cpp::ftrl (&learner)[PARALLEL_SIZE]){
 
 int _tmain(int argc, _TCHAR* argv[]){
 
-	cpp::ftrl learner[PARALLEL_SIZE];
+	cpp::ftrl learner;
 
 	double logloss = _train(learner);
 	std::cout << "train log loss-" << logloss << std::endl;
