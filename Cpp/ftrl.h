@@ -28,7 +28,6 @@ namespace cpp{
 
 		string fheaders[NO_FEATURE];
 
-		double _logloss;
 		std::unordered_map<size_t, std::vector<double>> _wzn;
 		std::unordered_map<size_t, std::pair<size_t, size_t>> _id_imp_cl;
 
@@ -65,7 +64,7 @@ namespace cpp{
 			if (is_train || !is_new){
 
 				std::pair<size_t, size_t>* imp_cl = &_id_imp_cl[id_hash];
-				if (imp_cl->first > 10)
+				if (imp_cl->first > 100)
 					x.push_back(std::make_pair(hash_fn(f_str), imp_cl->second / imp_cl->first));
 
 				if (is_train){
@@ -131,7 +130,7 @@ namespace cpp{
 	public:
 
 		ftrl(const double alpha = 0.1, const double beta = 1, const double l1 = 1, const double l2 = 1)
-			: _alpha(alpha), _beta(beta), _l1(l1), _l2(l2), _logloss(0){
+			: _alpha(alpha), _beta(beta), _l1(l1), _l2(l2){
 
 			for (int i = 0; i < NO_FEATURE; ++i){
 			
@@ -157,33 +156,26 @@ namespace cpp{
 			return 1 / (1 + std::exp(0 - std::max(std::min(wTx, 35.0), -35.0)));
 		}
 
-		double train(const std::vector<std::vector<string>>& block_vec){
+		void train(const std::vector<std::vector<string>>& block_vec){
 
-			int count = 2;
-			int ll_count = 0;
 			for (std::vector<std::vector<string>>::const_iterator it = block_vec.begin();
 				it != block_vec.end(); ++it)	{
 
-				//if (count % HOLD_OUT == 0 || count % HOLD_OUT == 1){
-
-				//	double p = predict(*it, true);
-				//	_logloss += _calc_logloss(p, std::stod((*it)[1]));
-				//	ll_count++;
-				//}
-				//else{
-
-					_train(*it);
-				//}
-
-				count++;
+				_train(*it);
 			}
-
-			return _logloss / ll_count;
 		}
 
-		double get_logloss() const{
+		double validate(const std::vector<std::vector<string>>& block_vec){
+		
+			double logloss = 0;
+			for (std::vector<std::vector<string>>::const_iterator it = block_vec.begin();
+				it != block_vec.end(); ++it)	{
+				
+				double p = predict(*it, true);
+				logloss += _calc_logloss(p, std::stod((*it)[1]));
+			}
 
-			return _logloss;
+			return logloss;
 		}
 	};
 }

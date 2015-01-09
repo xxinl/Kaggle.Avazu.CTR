@@ -36,7 +36,7 @@ string _get_current_dt_str(){
 	return s.str();
 }
 
-double _train(cpp::ftrl& learner){
+double _train(cpp::ftrl& learner, bool validate){
 
 	//train----------------------------
 	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train.csv");
@@ -47,6 +47,7 @@ double _train(cpp::ftrl& learner){
 
 	int block_i = 0;
 	double logloss = 0;
+	int logloss_size = 0;
 	while (train_file.read_chunk(BLOCK_SIZE, block_vec)) {
 
 		std::cout << "read in block " << block_i << " @" << _get_current_dt_str() << std::endl;
@@ -64,7 +65,15 @@ double _train(cpp::ftrl& learner){
 		std::cout << "start training block " << block_i++ << " @" << _get_current_dt_str() << std::endl;
 		fut_train = std::async([&]{
 
-			logloss += learner.train(block_vec_copy);
+			if (block_i < 60 || !validate){
+
+				learner.train(block_vec_copy);
+			}
+			else{
+
+				logloss += learner.validate(block_vec_copy);
+				logloss_size += block_vec_copy.size();
+			}
 		});
 
 		block_vec.clear();
@@ -77,7 +86,7 @@ double _train(cpp::ftrl& learner){
 	}
 
 	train_file.close();
-	return logloss / block_i;
+	return logloss / logloss_size;
 }
 
 void _test(cpp::ftrl& learner){
@@ -140,8 +149,9 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 	cpp::ftrl learner;
 
-	double logloss = _train(learner);
-	std::cout << "train log loss-" << logloss << std::endl;
+	_train(learner, false);
+	double logloss = _train(learner, false);
+	std::cout << "train log loss:" << logloss << std::endl;
 
 	_test(learner);
 	std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
