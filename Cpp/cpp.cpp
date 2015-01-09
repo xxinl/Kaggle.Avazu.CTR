@@ -145,5 +145,9 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 	_test(learner);
 	std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
+	
+	string l;
+	std::getline(std::cin, l);
+
 	return 1;
 }

@@ -65,7 +65,7 @@ namespace cpp{
 			if (is_train || !is_new){
 
 				std::pair<size_t, size_t>* imp_cl = &_id_imp_cl[id_hash];
-				if (imp_cl->first != 0)
+				if (imp_cl->first > 10)
 					x.push_back(std::make_pair(hash_fn(f_str), imp_cl->second / imp_cl->first));
 
 				if (is_train){
