@@ -149,8 +149,11 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 	cpp::ftrl learner;
 
-	_train(learner, false);
-	double logloss = _train(learner, false);
+	double logloss = 0;
+	for (int i = 0; i < 3; ++i){
+		
+		logloss = _train(learner, false);
+	}
 	std::cout << "train log loss:" << logloss << std::endl;
 
 	_test(learner);

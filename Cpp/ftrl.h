@@ -129,7 +129,7 @@ namespace cpp{
 
 	public:
 
-		ftrl(const double alpha = 0.1, const double beta = 1, const double l1 = 1, const double l2 = 1)
+		ftrl(const double alpha = 0.05, const double beta = 1, const double l1 = 0.5, const double l2 = 0.5)
 			: _alpha(alpha), _beta(beta), _l1(l1), _l2(l2){
 
 			for (int i = 0; i < NO_FEATURE; ++i){
