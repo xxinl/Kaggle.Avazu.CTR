@@ -1,72 +1,48 @@
 #include "stdafx.h"
+
 #include "ftrl.h"
 
 
-void cpp::ftrl::_gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, size_t>>& x, bool is_train){
+void cpp::ftrl::_gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, double>>& x, bool addImp){
 
 	std::hash<string> hash_fn;
 
-	int header_i = 0;
-	for (int i = 0; i < x_raw.size(); ++i){
+	for (int i = 0; i < f.size(); ++i){
 
-		if (i == 1 && is_train)
-			continue;
+		if (x_raw[f[i]] == "NA") continue;
 
-		if (header_i != 0 && header_i != 1 && header_i != 2 && header_i != 5 && header_i != 8 && header_i != 10 
-			&& header_i != 11 && header_i != 13 && header_i != 14 && header_i != 15 && header_i != 18){
-
-			if (!((x_raw[4 + is_train] == "85f751fd" && (header_i == 4 || header_i == 6))
-				|| (x_raw[7 + is_train] == "ecad2386" && (header_i == 7 || header_i == 9)))){
-
-				string f = string("F") + fheaders[header_i] + "_" + x_raw[i];
-				x.push_back(std::make_pair(hash_fn(f), 1));
-			}
-		}
-
-		header_i++;
-	};
-
-	//add hour
-	string hour = x_raw[1 + is_train].substr(6, 2);
-	string f = string("FHOUR") + "_" + hour;
-	x.push_back(std::make_pair(hash_fn(f), 1));
-
-	//add weekday
-	string day = x_raw[1 + is_train].substr(4, 2);
-	f = string("FDAY") + "_" + std::to_string((std::stoi(day) - 19) % 7);
-	x.push_back(std::make_pair(hash_fn(f), 1));
-
-	//c1+device_type
-	f = string("FC1DTYPE") + "_" + x_raw[2 + is_train] + "_" + x_raw[13 + is_train];
-	x.push_back(std::make_pair(hash_fn(f), 1));
-
-	//c14+c17
-	f = string("FC14C17") + "_" + x_raw[15 + is_train] + "_" + x_raw[18 + is_train];
-	x.push_back(std::make_pair(hash_fn(f), 1));
-
-	//double y = is_train ? std::stod(x_raw[1]) : 0;
-	////id imp and click
-	//_add_imp_f(x_raw[4+is_train], is_train, x, y, "F_SITEIMP");
-	////id imp and click
-	//_add_imp_f(x_raw[7+is_train], is_train, x, y, "F_APPIMP");
-
-	//interact
-	const int f1[3] = { 3, 12, 13 };
-	const int f2[6] = { 4, 6, 7, 9, 12, 13 };
-
-	for (int i = 0; i < 3; ++i){
-
-		for (int j = 0; j < 6; ++j){
-
-			if (i > 0 && j > 3) continue;
-
-			if (!(((f2[j] == 4 || f2[j] == 6) && x_raw[4 + is_train] == "85f751fd")
-				|| ((f2[j] == 7 || f2[j] == 9) && x_raw[7 + is_train] == "ecad2386")))
-			{
-				string f = string("F") + fheaders[header_i] + "_" + x_raw[f1[i] + is_train] + "_" + x_raw[f2[j] + is_train];
-				x.push_back(std::make_pair(hash_fn(f), 1));
-			}
-			header_i++;
-		}
+		string f_str = string("F_") + std::to_string(i) + "_" + x_raw[f[i]];
+		x.push_back(std::make_pair(hash_fn(f_str), 1));
 	}
+
+	for (int i = 0; i < f2.size(); ++i){
+
+		if (x_raw[f2[i][0]] == "NA" || x_raw[f2[i][1]] == "NA"){
+			
+			continue;
+		}
+
+		string f_str = "F_" + std::to_string(f2[i][0]) + "_" + std::to_string(f2[i][1]) + "_"
+			+ x_raw[f2[i][0]] + "_" + x_raw[f2[i][1]];
+
+		x.push_back(std::make_pair(hash_fn(f_str), 1));
+	}
+
+	//if (addImp){
+
+	//	//site_id imp
+	//	size_t hashed_id = hash_fn(x_raw[C_SITE_ID]);
+	//	std::unordered_map<size_t, double>::const_iterator it_id_imp = _id_imp.find(hashed_id);
+	//	if (it_id_imp != _id_imp.end()){
+
+	//		x.push_back(std::make_pair(hash_fn("F_SITE_IMP"), it_id_imp->second));
+	//	}
+	//	//app_id imp
+	//	hashed_id = hash_fn(x_raw[C_APP_ID]);
+	//	it_id_imp = _id_imp.find(hashed_id);
+	//	if (it_id_imp != _id_imp.end()){
+
+	//		x.push_back(std::make_pair(hash_fn("F_APP_IMP"), it_id_imp->second));
+	//	}
+	//}
 }

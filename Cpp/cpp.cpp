@@ -36,10 +36,10 @@ string _get_current_dt_str(){
 	return s.str();
 }
 
-double _train(cpp::ftrl& learner, bool validate){
+double _train(cpp::ftrl& learner, bool validate, bool addImp){
 
 	//train----------------------------
-	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train.csv");
+	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train_p.csv");
 
 	std::vector<std::vector<string>> block_vec;
 	std::vector<std::vector<string>> block_vec_copy;
@@ -67,7 +67,7 @@ double _train(cpp::ftrl& learner, bool validate){
 
 			if (block_i < 60 || !validate){
 
-				learner.train(block_vec_copy);
+				learner.train(block_vec_copy, addImp);
 			}
 			else{
 
@@ -92,7 +92,7 @@ double _train(cpp::ftrl& learner, bool validate){
 void _test(cpp::ftrl& learner){
 
 	//predict------------------------
-	cpp::csv test_file("C:/Workspace/Kaggle/CRT/data/test.csv");
+	cpp::csv test_file("C:/Workspace/Kaggle/CRT/data/test_p.csv");
 	std::ofstream submit_file("C:/Workspace/Kaggle/CRT/data/submit.csv");
 
 	submit_file << "id,click" << std::endl;
@@ -124,9 +124,9 @@ void _test(cpp::ftrl& learner){
 				it != block_vec_copy.end(); ++it)	{
 
 				double p = 0;
-				p = learner.predict(*it, false);
+				p = learner.predict(*it);
 
-				submit_file << (*it)[0] << "," << p << std::endl;
+				submit_file << (*it)[C_ID] << "," << p << std::endl;
 			}
 		});
 
@@ -152,7 +152,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 	double logloss = 0;
 	for (int i = 0; i < 3; ++i){
 		
-		logloss = _train(learner, false);
+		logloss = _train(learner, false, i == 2);
 	}
 	std::cout << "train log loss:" << logloss << std::endl;
 
