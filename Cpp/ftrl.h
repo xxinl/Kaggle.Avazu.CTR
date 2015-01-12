@@ -56,7 +56,7 @@ namespace cpp{
 		const double _l2;
 
 		std::unordered_map<size_t, std::vector<double>> _wzn;
-		std::unordered_map<size_t, double> _id_imp;
+		//std::unordered_map<size_t, double> _id_imp;
 
 		bool _check_wzn_exist(const size_t xi){
 
@@ -74,7 +74,7 @@ namespace cpp{
 			}
 		}
 
-		void _gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, double>>& x, bool addImp);
+		void _gen_features(const std::vector<string>& x_raw, std::vector<std::pair<size_t, double>>& x);
 
 		double _calc_logloss(const double p, const double y){
 
@@ -82,12 +82,12 @@ namespace cpp{
 			return y == 1 ? 0 - log(p2) : 0 - log(1 - p2);
 		}
 
-		void _train(const std::vector<string>& x_raw, bool addImp){
+		void _train(const std::vector<string>& x_raw){
 
 			double y = std::stod(x_raw[C_CLICK]);
 
 			std::vector<std::pair<size_t, double>> x;
-			_gen_features(x_raw, x, addImp);
+			_gen_features(x_raw, x);
 
 			//predict
 			double wTx = 0;
@@ -143,25 +143,12 @@ namespace cpp{
 				{ C_DEV_MODEL, C_SITE_ID }, { C_DEV_MODEL, C_SITE_CAT }, { C_DEV_MODEL, C_APP_ID },
 				{ C_DEV_MODEL, C_APP_CAT }, { C_DEV_TYPE, C_SITE_ID }, { C_DEV_TYPE, C_SITE_CAT }, { C_DEV_TYPE, C_APP_ID },
 				{ C_DEV_TYPE, C_APP_CAT } };
-
-			//cpp::csv id_imp_file("C:/Workspace/Kaggle/CRT/data/id_imp.csv");
-			//std::vector<std::vector<string>> block_vec;
-			//id_imp_file.read_chunk(1000000, block_vec);
-
-			//std::hash<string> hash_fn;
-			//for (std::vector<std::vector<string>>::iterator it(block_vec.begin());
-			//	it != block_vec.end(); ++it)	{
-
-			//	if (std::stoi((*it)[3]) < 100) break;
-
-			//	_id_imp.insert(std::make_pair(hash_fn((*it)[0]), std::stod((*it)[4])));
-			//}
 		}
 
 		double predict(const std::vector<string>& x_raw){
 
 			std::vector<std::pair<size_t, double>> x;
-			_gen_features(x_raw, x, true);
+			_gen_features(x_raw, x);
 
 			double wTx = 0;
 			for (std::vector<std::pair<size_t, double>>::const_iterator it_xi = x.begin(); it_xi != x.end(); ++it_xi)	{
@@ -176,12 +163,12 @@ namespace cpp{
 			return 1 / (1 + std::exp(0 - std::max(std::min(wTx, 35.0), -35.0)));
 		}
 
-		void train(const std::vector<std::vector<string>>& block_vec, bool addImp){
+		void train(const std::vector<std::vector<string>>& block_vec){
 
 			for (std::vector<std::vector<string>>::const_iterator it = block_vec.begin();
 				it != block_vec.end(); ++it)	{
 
-				_train(*it, addImp);
+				_train(*it);
 			}
 		}
 

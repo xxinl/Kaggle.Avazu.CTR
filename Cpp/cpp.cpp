@@ -36,7 +36,7 @@ string _get_current_dt_str(){
 	return s.str();
 }
 
-double _train(cpp::ftrl& learner, bool validate, bool addImp){
+double _train(cpp::ftrl& learner, bool validate){
 
 	//train----------------------------
 	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train_p.csv");
@@ -67,7 +67,7 @@ double _train(cpp::ftrl& learner, bool validate, bool addImp){
 
 			if (block_i < 60 || !validate){
 
-				learner.train(block_vec_copy, addImp);
+				learner.train(block_vec_copy);
 			}
 			else{
 
@@ -152,7 +152,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 	double logloss = 0;
 	for (int i = 0; i < 3; ++i){
 		
-		logloss = _train(learner, false, i == 2);
+		logloss = _train(learner, false);
 	}
 	std::cout << "train log loss:" << logloss << std::endl;
 
