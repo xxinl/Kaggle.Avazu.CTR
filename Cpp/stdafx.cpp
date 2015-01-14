@@ -19,7 +19,10 @@
 #include <algorithm>
 #include <iostream>
 #include <future>
+#include <time.h>
 
+#include <ppl.h>
+#include <concurrent_vector.h>
 
 #include <boost/tokenizer.hpp>
 #include <boost/date_time.hpp>

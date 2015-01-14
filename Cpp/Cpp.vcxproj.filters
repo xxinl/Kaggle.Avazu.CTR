@@ -27,6 +27,12 @@
     <ClInclude Include="ftrl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="feature_select_genetic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

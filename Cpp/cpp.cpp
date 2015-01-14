@@ -9,11 +9,13 @@
 #include <sstream>
 #include <iostream>
 #include <future>
+#include <time.h>
 
 #include <boost/date_time.hpp>
 
 #include "csv.h"
 #include "ftrl.h"
+#include "feature_select_genetic.h"
 
 
 using std::string;
@@ -146,18 +148,23 @@ void _test(cpp::ftrl& learner){
 }
 
 int _tmain(int argc, _TCHAR* argv[]){
+	
+	srand((unsigned int)time(NULL));
 
-	cpp::ftrl learner;
+	//cpp::ftrl learner;
 
-	double logloss = 0;
-	for (int i = 0; i < 3; ++i){
-		
-		logloss = _train(learner, false);
-	}
-	std::cout << "train log loss:" << logloss << std::endl;
+	//double logloss = 0;
+	//for (int i = 0; i < 3; ++i){
+	//	
+	//	logloss = _train(learner, false);
+	//}
+	//std::cout << "train log loss:" << logloss << std::endl;
 
-	_test(learner);
-	std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
+	//_test(learner);
+	//std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
+
+	cpp::feature_select_genetic select;
+	select.optimize();
 	
 	string l;
 	std::getline(std::cin, l);
