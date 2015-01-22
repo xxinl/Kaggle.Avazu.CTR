@@ -16,10 +16,10 @@
 using std::string;
 
 #define TRAIN_SIZE 8000000
-#define VAL_SIZE 1600000
+#define VAL_SIZE 2000000
 
-#define TRAIN_SAMPLE_SIZE 400000
-#define VAL_SAMPLE_SIZE 80000
+#define TRAIN_SAMPLE_SIZE 128000
+#define VAL_SAMPLE_SIZE 32000
 
 namespace cpp{
 
@@ -146,12 +146,17 @@ namespace cpp{
 				else
 				{
 					int i1 = rand() % _population_size;
+					if (i1 >= _elite_size)
+						i1 = rand() % _population_size;
 					int i2 = rand() % _population_size;
+					if (i2 >= _elite_size)
+						i2 = rand() % _population_size;
+
 
 					std::vector<std::vector<int>> mated;
 					for (int j = 0; j < _feature_size; ++j){
 
-						std::vector<int> feature = j % 2 == 0 ? _population[i1].second[j] : _population[i2].second[j];
+						std::vector<int> feature = rand() % 2 == 0 ? _population[i1].second[j] : _population[i2].second[j];
 						mated.push_back(feature);
 					}
 
@@ -218,7 +223,8 @@ namespace cpp{
 				double top_fit = _population.front().first;
 				_population.swap(_next_generation);
 
-				_calc_population_fitness(_population, _elite_size, _train_vec, _validate_vec);
+				//_calc_population_fitness(_population, _elite_size, _train_vec, _validate_vec);
+				_calc_population_fitness(_population, 0, _train_vec, _validate_vec);
 				_sort_population();
 				_print_elite();
 
@@ -245,8 +251,8 @@ namespace cpp{
 		}
 
 	public:
-		feature_select_genetic(double elite_rate = 0.20f, double mutation_rate = 0.20f, 
-			int max_iteration = 128, int population_size = 128, int feature_size = 32) :
+		feature_select_genetic(double elite_rate = 0.30f, double mutation_rate = 0.20f, 
+			int max_iteration = 256, int population_size = 128, int feature_size = 16) :
 			_elite_size(elite_rate * population_size), _mutation_rate(mutation_rate * 100),
 			_max_iteration(max_iteration), _population_size(population_size), _feature_size(feature_size),
 			_submit_file("C:/Workspace/Kaggle/CRT/data/f_select.csv"){

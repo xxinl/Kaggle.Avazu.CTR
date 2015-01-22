@@ -16,11 +16,13 @@
 #include "csv.h"
 #include "ftrl.h"
 #include "feature_select_genetic.h"
+#include "sample.h"
 
 
 using std::string;
 
 #define BLOCK_SIZE 500000 //0.5m rows
+#define SAMPLE_RATIO 0.2
 
 
 string _get_current_dt_str(){
@@ -38,10 +40,10 @@ string _get_current_dt_str(){
 	return s.str();
 }
 
-double _train(cpp::ftrl& learner, bool validate){
+double _train(cpp::ftrl& learner, bool validate, bool last_round){
 
 	//train----------------------------
-	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train_p.csv");
+	cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train_p1.csv");
 
 	std::vector<std::vector<string>> block_vec;
 	std::vector<std::vector<string>> block_vec_copy;
@@ -62,7 +64,15 @@ double _train(cpp::ftrl& learner, bool validate){
 		else
 			std::cout << std::endl;
 
-		block_vec_copy.swap(block_vec);
+
+		if (validate){
+		
+			cpp::sample sampler;
+			block_vec_copy.clear();
+			sampler.sampling(block_vec, block_vec_copy, BLOCK_SIZE * SAMPLE_RATIO);
+		}
+		else
+			block_vec_copy.swap(block_vec);
 
 		std::cout << "start training block " << block_i++ << " @" << _get_current_dt_str() << std::endl;
 		fut_train = std::async([&]{
@@ -71,7 +81,7 @@ double _train(cpp::ftrl& learner, bool validate){
 
 				learner.train(block_vec_copy);
 			}
-			else{
+			else if (last_round){
 
 				logloss += learner.validate(block_vec_copy);
 				logloss_size += block_vec_copy.size();
@@ -94,7 +104,7 @@ double _train(cpp::ftrl& learner, bool validate){
 void _test(cpp::ftrl& learner){
 
 	//predict------------------------
-	cpp::csv test_file("C:/Workspace/Kaggle/CRT/data/test_p.csv");
+	cpp::csv test_file("C:/Workspace/Kaggle/CRT/data/test_p1.csv");
 	std::ofstream submit_file("C:/Workspace/Kaggle/CRT/data/submit.csv");
 
 	submit_file << "id,click" << std::endl;
@@ -149,22 +159,25 @@ void _test(cpp::ftrl& learner){
 
 int _tmain(int argc, _TCHAR* argv[]){
 	
+	const bool validate = false;
 	srand((unsigned int)time(NULL));
 
-	//cpp::ftrl learner;
+	cpp::ftrl learner;
 
-	//double logloss = 0;
-	//for (int i = 0; i < 3; ++i){
-	//	
-	//	logloss = _train(learner, false);
-	//}
-	//std::cout << "train log loss:" << logloss << std::endl;
+	double logloss = 0;
+	for (int i = 0; i < 3; ++i){
+		
+		logloss = _train(learner, validate, i==2);
+	}
+	std::cout << "train log loss:" << logloss << std::endl;
 
-	//_test(learner);
-	//std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
+	if (!validate)
+		_test(learner);
 
-	cpp::feature_select_genetic select;
-	select.optimize();
+	std::cout << "done" << " @" << _get_current_dt_str() << std::endl;
+
+	//cpp::feature_select_genetic select;
+	//select.optimize();
 	
 	string l;
 	std::getline(std::cin, l);

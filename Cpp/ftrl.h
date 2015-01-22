@@ -138,11 +138,18 @@ namespace cpp{
 				C_DEV_MODEL, C_C15, C_C16, C_C18, C_C19, C_C20, C_C21 };
 
 			f2 = { { C_C1, C_DEV_TYPE }, { C_C14, C_C17 },
-				{ C_BANNER_POS, C_SITE_ID }, { C_BANNER_POS, C_SITE_CAT }, { C_BANNER_POS, C_APP_ID },
-				{ C_BANNER_POS, C_APP_CAT }, { C_BANNER_POS, C_DEV_MODEL }, { C_BANNER_POS, C_DEV_TYPE },
-				{ C_DEV_MODEL, C_SITE_ID }, { C_DEV_MODEL, C_SITE_CAT }, { C_DEV_MODEL, C_APP_ID },
-				{ C_DEV_MODEL, C_APP_CAT }, { C_DEV_TYPE, C_SITE_ID }, { C_DEV_TYPE, C_SITE_CAT }, { C_DEV_TYPE, C_APP_ID },
-				{ C_DEV_TYPE, C_APP_CAT } };
+			{ C_BANNER_POS, C_SITE_ID }, { C_BANNER_POS, C_SITE_CAT }, { C_BANNER_POS, C_APP_ID },
+			{ C_BANNER_POS, C_APP_CAT }, { C_BANNER_POS, C_DEV_MODEL }, { C_BANNER_POS, C_DEV_TYPE },
+			{ C_DEV_MODEL, C_SITE_ID }, { C_DEV_MODEL, C_SITE_CAT }, { C_DEV_MODEL, C_APP_ID },
+			{ C_DEV_MODEL, C_APP_CAT }, { C_DEV_TYPE, C_SITE_ID }, { C_DEV_TYPE, C_SITE_CAT }, { C_DEV_TYPE, C_APP_ID },
+			{ C_DEV_TYPE, C_APP_CAT }, { C_DAY, C_HOUR },
+			//------------------
+			//{ C_SITE_ID, C_C16 }, { C_C1, C_SITE_ID }, { C_HOUR, C_SITE_ID }, { C_HOUR, C_APP_ID },
+			//{ C_SITE_ID, C_C15 }, { C_APP_ID, C_C18 }, { C_HOUR, C_SITE_CAT }, { C_APP_ID, C_C15 },
+			//{ C_DAY, C_SITE_ID }, { C_SITE_ID, C_C17 },
+			//{ C_APP_ID, C_C16 }, { C_SITE_ID, C_C19 }, { C_DEV_MODEL, C_C17 }, { C_APP_ID, C_C20 }, 
+			//{ C_C18, C_C21 }, { C_SITE_ID, C_C21 }, { C_SITE_ID, C_C21 } 
+			};
 		}
 
 		double predict(const std::vector<string>& x_raw){
