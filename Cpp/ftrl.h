@@ -50,7 +50,7 @@ namespace cpp{
 	class ftrl {
 
 	private:
-		const double _alpha;
+		double _alpha;
 		const double _beta;
 		const double _l1;
 		const double _l2;
@@ -131,7 +131,7 @@ namespace cpp{
 		std::vector<int> f;
 		std::vector<std::vector<int>> f2;
 
-		ftrl(const double alpha = 0.05, const double beta = 1, const double l1 = 0.5, const double l2 = 1)
+		ftrl(double alpha = 0.1, const double beta = 1, const double l1 = 6, const double l2 = 6)
 			: _alpha(alpha), _beta(beta), _l1(l1), _l2(l2){
 
 			f = { C_DAY, C_HOUR, C_BANNER_POS, C_SITE_ID, C_SITE_CAT, C_APP_ID, C_APP_CAT,
@@ -142,13 +142,26 @@ namespace cpp{
 			{ C_BANNER_POS, C_APP_CAT }, { C_BANNER_POS, C_DEV_MODEL }, { C_BANNER_POS, C_DEV_TYPE },
 			{ C_DEV_MODEL, C_SITE_ID }, { C_DEV_MODEL, C_SITE_CAT }, { C_DEV_MODEL, C_APP_ID },
 			{ C_DEV_MODEL, C_APP_CAT }, { C_DEV_TYPE, C_SITE_ID }, { C_DEV_TYPE, C_SITE_CAT }, { C_DEV_TYPE, C_APP_ID },
-			{ C_DEV_TYPE, C_APP_CAT }, { C_DAY, C_HOUR },
+			{ C_DEV_TYPE, C_APP_CAT },
 			//------------------
+			//--------------------------
 			//{ C_SITE_ID, C_C16 }, { C_C1, C_SITE_ID }, { C_HOUR, C_SITE_ID }, { C_HOUR, C_APP_ID },
-			//{ C_SITE_ID, C_C15 }, { C_APP_ID, C_C18 }, { C_HOUR, C_SITE_CAT }, { C_APP_ID, C_C15 },
-			//{ C_DAY, C_SITE_ID }, { C_SITE_ID, C_C17 },
+			//{ C_SITE_ID, C_C15 }, { C_APP_ID, C_C18 }, { C_HOUR, C_SITE_CAT }, { C_HOUR, C_APP_CAT }, 
+			//{ C_APP_ID, C_C15 },  { C_DAY, C_SITE_ID }, { C_SITE_ID, C_C17 },
 			//{ C_APP_ID, C_C16 }, { C_SITE_ID, C_C19 }, { C_DEV_MODEL, C_C17 }, { C_APP_ID, C_C20 }, 
 			//{ C_C18, C_C21 }, { C_SITE_ID, C_C21 }, { C_SITE_ID, C_C21 } 
+			{ 4 , 17 }, { 2 , 4 }, { 1 , 4 }, { 4 , 16 }, { 1 , 6 }, { 7 , 16 }, { 0 , 4 }, { 4 , 6 }, { 4 , 18 }, 
+			{ 7 , 17 }, { 4 , 20 }, { 2 , 19 }, { 12 , 18 }, { 7 , 21 }, { 19 , 22 }, { 4 , 22 }, { 4 , 21 }, { 3 , 19 },
+			{ 13 , 21 }, { 4 , 19 }, { 13 , 19 }, { 12 , 19 }, { 16 , 19 }, { 2 , 7 }, { 3 , 17 }, { 12 , 15 }, { 16 , 18 }, { 4 , 9 }, { 17 , 20 }, { 6 , 17 },
+			{ 7 , 19 }, { 7 , 9 }, { 6 , 16 }, { 17 , 19 }, { 1 , 20 }, { 15 , 20 }, { 6 , 21 }, { 15 , 19 }, { 2 , 16 }, { 17 , 22 }, { 6 , 15 }, { 9 , 20 }, { 0 , 7 },
+			{ 2 , 3 }, { 3 , 22 }, { 13 , 20 }, { 2 , 6 }, { 6 , 20 }, { 18 , 21 }, { 0 , 15 }, { 12 , 17 }, { 16 , 17 }, { 6 , 9 }, { 15 , 21 },
+			{ 9 , 15 }, { 13 , 17 }, { 12 , 22 }, { 4 , 7 }, { 2 , 21 }, { 4 , 15 }, { 15 , 16 }, { 3 , 18 }, { 18 , 22 }, { 1 , 9 }, { 2 , 20 },
+			{ 2 , 22 }, { 13 , 16 }, { 2 , 18 }, { 18 , 19 }, { 0 , 18 }, { 15 , 17 }, { 9 , 22 }, { 9 , 16 }, { 3 , 20 }, { 2 , 12 }, { 7 , 20 }, { 3 , 21 },
+			{1 , 19}, { 12 , 21 }, { 19 , 21 }, { 9 , 18 }, { 12 , 16 }, { 18 , 20 }, { 6 , 18 }, { 0 , 6 }, { 1 , 17 }, { 12 , 20 }, { 9 , 21 },
+			{ 6 , 19 }, { 3 , 15 }, { 9 , 17 }, { 1 , 13 }, { 2 , 9 }, { 19 , 20 }, { 12 , 13 }, { 13 , 15 }, { 17 , 18 }, { 20 , 22 }, { 16 , 22 }, { 3 , 16 }, { 16 , 21 },
+			{ 2 , 17 }, { 1 , 16 }, { 13 , 22 }, { 7 , 15 }, { 7 , 22 }, { 1 , 3 }, { 9 , 19 }, { 13 , 18 }, { 17 , 21 }, { 0 , 20 }, { 1 , 7 }, { 0 , 22 }, { 20 , 21 },
+			{ 1 , 15 }, { 7 , 18 }, { 1 , 12 }, { 2 , 15 }, { 15 , 22 }, { 1 , 18 }, { 0 , 21 }, { 0 , 9 }, { 1 , 2 }, { 21 , 22 }, { 6 , 22 }, { 6 , 7 }, { 16 , 20 },
+			{ 1 , 21 }, { 0 , 12 }, { 0 , 19 }, { 1 , 22 }, { 0 , 1 }, { 0 , 3 }, { 0 , 16 }, { 0 , 17 }, { 0 , 13 }, { 0 , 2 }
 			};
 		}
 
@@ -190,6 +203,11 @@ namespace cpp{
 			}
 
 			return logloss;
+		}
+
+		void decay_alpha(){
+
+			_alpha = _alpha * 0.6;
 		}
 	};
 }

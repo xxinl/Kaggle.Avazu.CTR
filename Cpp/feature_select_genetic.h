@@ -261,8 +261,8 @@ namespace cpp{
 				C_DEV_MODEL, C_DEV_TYPE, C_C14, C_C15, C_C16, C_C17, C_C18, C_C19, C_C20, C_C21 };
 			
 			cpp::csv train_file("C:/Workspace/Kaggle/CRT/data/train_p.csv");
-			train_file.read_chunk(TRAIN_SIZE, _train_vec);
-			train_file.read_chunk(VAL_SIZE, _validate_vec);
+			train_file.read_chunk(TRAIN_SIZE, _train_vec, true);
+			train_file.read_chunk(VAL_SIZE, _validate_vec, true);
 			train_file.close();
 		}
 

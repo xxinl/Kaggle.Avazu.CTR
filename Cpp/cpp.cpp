@@ -52,7 +52,7 @@ double _train(cpp::ftrl& learner, bool validate, bool last_round){
 	int block_i = 0;
 	double logloss = 0;
 	int logloss_size = 0;
-	while (train_file.read_chunk(BLOCK_SIZE, block_vec)) {
+	while (train_file.read_chunk(BLOCK_SIZE, block_vec, false)) {
 
 		std::cout << "read in block " << block_i << " @" << _get_current_dt_str() << std::endl;
 
@@ -115,7 +115,7 @@ void _test(cpp::ftrl& learner){
 	std::future<void> fut_test;
 
 	int block_i = 0;
-	while (test_file.read_chunk(400000, block_vec)) {
+	while (test_file.read_chunk(400000, block_vec, false)) {
 
 		std::cout << "reading in block " << block_i << " @" << _get_current_dt_str() << std::endl;
 
@@ -137,6 +137,9 @@ void _test(cpp::ftrl& learner){
 
 				double p = 0;
 				p = learner.predict(*it);
+
+				if (p > 0.99) p = 1;
+				if (p < 0.001) p = 0;
 
 				submit_file << (*it)[C_ID] << "," << p << std::endl;
 			}
@@ -165,9 +168,10 @@ int _tmain(int argc, _TCHAR* argv[]){
 	cpp::ftrl learner;
 
 	double logloss = 0;
-	for (int i = 0; i < 3; ++i){
+	for (int i = 0; i < 5; ++i){
 		
-		logloss = _train(learner, validate, i==2);
+		logloss = _train(learner, validate, i == 4);
+		learner.decay_alpha();
 	}
 	std::cout << "train log loss:" << logloss << std::endl;
 

@@ -37,8 +37,10 @@ namespace cpp{
 				_file.close();
 		}
 		
-		bool read_chunk(size_t no_lines, std::vector<std::vector<string>>& block_vec){	
+		bool read_chunk(size_t no_lines, std::vector<std::vector<string>>& block_vec, bool balance){	
 		
+			std::vector<std::vector<string>> temp_block_vec;
+
 			string line;
 
 			size_t report_size = no_lines / 10;
@@ -61,8 +63,34 @@ namespace cpp{
 					row_vec.push_back(*it);
 				}
 
-				block_vec.push_back(row_vec);
+				if (balance){
+					temp_block_vec.push_back(row_vec);
 
+					if (row_vec[23] == "1"){
+
+						if (temp_block_vec.size() < 4){
+
+							for (std::vector<std::vector<string>>::iterator it_temp(temp_block_vec.begin()); it_temp!= temp_block_vec.end(); ++it_temp){
+
+								block_vec.push_back(*it_temp);
+							}
+						}
+						else{
+
+							for (int i = 0; i < temp_block_vec.size() * 0.6; ++i){
+
+								block_vec.push_back(temp_block_vec[rand() % temp_block_vec.size()]);
+							}
+						}
+
+						temp_block_vec.clear();
+					}
+				}
+				else{
+					
+					block_vec.push_back(row_vec);
+				}
+				
 				count++;
 			}
 
