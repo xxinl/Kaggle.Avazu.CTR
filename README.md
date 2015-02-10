@@ -7,3 +7,4 @@ C++ implementation of [google's FTRL-Proximal](http://research.google.com/pubs/p
 ###You will find these implementations from codebase:
 * [Google's FTRL-Proximal algorithm](http://research.google.com/pubs/pub41159.html)
 * Genetic algorithm for feature selection
+* Sampling
